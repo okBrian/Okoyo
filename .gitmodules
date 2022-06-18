@@ -1,0 +1,3 @@
+[submodule "CoreGraphics"]
+	path = CoreGraphics
+	url = https://github.com/okBrian/CoreGraphics.git

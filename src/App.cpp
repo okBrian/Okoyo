@@ -20,6 +20,10 @@ public:
         while(!glfwWindowShouldClose(getWindow()))
         {
             glfwPollEvents();
+            ImGuiNewFrame();
+            ImGui::ShowDemoWindow();
+
+            ImGuiRenderFrame();
             glfwSwapBuffers(getWindow());
         }
     }

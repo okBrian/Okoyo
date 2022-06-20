@@ -1,30 +1,26 @@
 #include <Core.hpp>
-
+using namespace Core;
 
 class App : public Core::CoreApp
 {
+private:
+    WindowsPlatform window; 
 public:
     App()
-        : CoreApp()
+        : CoreApp(), window(WindowsPlatform())
     {
-        CoreApp::init();
+        window.setVSync(true);
     }
 
     ~App() 
     {
-        CoreAppShutdown();
     }
 
-    void run() 
+    void run()
     {
-        while(!glfwWindowShouldClose(getWindow()))
+        while(window.WindowRunning)
         {
-            glfwPollEvents();
-            ImGuiNewFrame();
-            ImGui::ShowDemoWindow();
-
-            ImGuiRenderFrame();
-            glfwSwapBuffers(getWindow());
+            window.onUpdate();
         }
     }
 };

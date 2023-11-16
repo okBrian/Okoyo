@@ -10,7 +10,7 @@ class App : public Core::CoreApp
 private:
     // Everything needed to make a Square on the screen;
     Renderer renderer;
-    WindowsPlatform window; 
+    WindowsPlatform window;
     VAO vao;
     IBO ibo;
     Shader shaderProgram;
@@ -21,37 +21,37 @@ private:
     VAO fboVAO;
     GLfloat vertices[16] = {
         //     Position       TexCoord
-       -1.0f,  1.0f     , 1.0f, 1.0f, // top left
-        1.0f,  1.0f     , 0.0f, 1.0f, // top right
-       -1.0f, -1.0f     , 1.0f, 0.0f, // below left
-        1.0f, -1.0f     , 0.0f, 0.0f  // below right 
+        -1.0f, 1.0f, 1.0f, 1.0f,  // top left
+        1.0f, 1.0f, 0.0f, 1.0f,   // top right
+        -1.0f, -1.0f, 1.0f, 0.0f, // below left
+        1.0f, -1.0f, 0.0f, 0.0f   // below right
     };
     // Set up index
     GLuint indices[6] = {
         0, 1, 2,
-        1, 2, 3
-    };
+        1, 2, 3};
 
     float fboVertices[24] =
-    {
-        // Coords    // texCoords
-         1.0f, -1.0f,  1.0f, 0.0f,
-        -1.0f, -1.0f,  0.0f, 0.0f,
-        -1.0f,  1.0f,  0.0f, 1.0f,
+        {
+            // Coords    // texCoords
+            1.0f, -1.0f, 1.0f, 0.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f,
+            -1.0f, 1.0f, 0.0f, 1.0f,
 
-         1.0f,  1.0f,  1.0f, 1.0f,
-         1.0f, -1.0f,  1.0f, 0.0f,
-        -1.0f,  1.0f,  0.0f, 1.0f
-    };
+            1.0f, 1.0f, 1.0f, 1.0f,
+            1.0f, -1.0f, 1.0f, 0.0f,
+            -1.0f, 1.0f, 0.0f, 1.0f};
 
     int select;
-    int colorRange[6] = { 0, 255, 0, 255, 0, 255 };
+    int colorRange[6] = {0, 255, 0, 255, 0, 255};
+    bool showDemoWindow = false;
+
 public:
     App()
         : CoreApp(), window(WindowsPlatform("Okoyo Image Proccessing", width, height)), select(0)
     {
         // Load OpenGL, Enable GL Debugging, and VSync - True //
-        if(!LoadOpenGLContext())
+        if (!LoadOpenGLContext())
         {
             window.Close();
             return;
@@ -69,7 +69,7 @@ public:
 
         VBOLayout layout;
         layout.Push<float>(2);
-        layout.Push<float>(2); 
+        layout.Push<float>(2);
         vao.AddBuffer(vbo, layout);
 
         shaderProgram.Bind();
@@ -86,7 +86,7 @@ public:
         VBO fboVBO;
         fboVAO.init();
         fboVBO.init(fboVertices, sizeof(fboVertices), GL_STATIC_DRAW);
-        
+
         VBOLayout fboLayout;
         fboLayout.Push<float>(2);
         fboLayout.Push<float>(2);
@@ -105,13 +105,12 @@ public:
 
         fboProgram.init("../../res/framebuffer.vert", "../../res/framebuffer.frag");
         fboProgram.Bind();
-	    glUniform1i(glGetUniformLocation(fboProgram.getID(), "screenTexture"), 0);
+        glUniform1i(glGetUniformLocation(fboProgram.getID(), "screenTexture"), 0);
 
-        // Error checking framebuffer // 
+        // Error checking framebuffer //
         auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (fboStatus != GL_FRAMEBUFFER_COMPLETE)
             APP_ERROR("Framebuffer error: {}", fboStatus);
-
     }
 
     ~App()
@@ -127,29 +126,31 @@ public:
         fbo.Bind();
         renderer.Clear();
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            
+
         shaderProgram.Bind();
         texture.Bind();
         renderer.Draw(vao, ibo, shaderProgram);
 
-		// Bind the default framebuffer
-		fbo.Unbind();
-		// Draw the framebuffer rectangle
-		fboProgram.Bind();
+        // Bind the default framebuffer
+        fbo.Unbind();
+        // Draw the framebuffer rectangle
+        fboProgram.Bind();
         fboProgram.SetUniform1i("texCodeId", select);
-        fboProgram.SetUniform1f("hmin", static_cast<float>(colorRange[0])/255);
-        fboProgram.SetUniform1f("hmax", static_cast<float>(colorRange[1])/255);
-        fboProgram.SetUniform1f("smin", static_cast<float>(colorRange[2])/255);
-        fboProgram.SetUniform1f("smax", static_cast<float>(colorRange[3])/255);
-        fboProgram.SetUniform1f("vmin", static_cast<float>(colorRange[4])/255);
-        fboProgram.SetUniform1f("vmax", static_cast<float>(colorRange[5])/255);
-		fboVAO.Bind();
-		fbo.BindTexture();
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+        fboProgram.SetUniform1f("hmin", static_cast<float>(colorRange[0]) / 255);
+        fboProgram.SetUniform1f("hmax", static_cast<float>(colorRange[1]) / 255);
+        fboProgram.SetUniform1f("smin", static_cast<float>(colorRange[2]) / 255);
+        fboProgram.SetUniform1f("smax", static_cast<float>(colorRange[3]) / 255);
+        fboProgram.SetUniform1f("vmin", static_cast<float>(colorRange[4]) / 255);
+        fboProgram.SetUniform1f("vmax", static_cast<float>(colorRange[5]) / 255);
+        fboVAO.Bind();
+        fbo.BindTexture();
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
     void onImGuiRenderer() override
     {
+
+        ImGui::ShowDemoWindow(&showDemoWindow);
         ImGui::Begin("Options");
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::End();
@@ -169,7 +170,7 @@ public:
     }
 };
 
-Core::CoreApp* Core::CreateApp()
+Core::CoreApp *Core::CreateApp()
 {
     return new App();
 }

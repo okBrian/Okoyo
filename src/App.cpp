@@ -67,7 +67,7 @@ public:
         shaderProgram.init("../../res/default.vert", "../../res/default.frag");
         ImGuiClass::init(Window::getWindow());
 
-        VBOLayout layout;
+        Layout layout;
         layout.Push<float>(2);
         layout.Push<float>(2);
         vao.AddBuffer(vbo, layout);
@@ -87,7 +87,7 @@ public:
         fboVAO.init();
         fboVBO.init(fboVertices, sizeof(fboVertices), GL_STATIC_DRAW);
 
-        VBOLayout fboLayout;
+        Layout fboLayout;
         fboLayout.Push<float>(2);
         fboLayout.Push<float>(2);
         fboVAO.AddBuffer(fboVBO, fboLayout);

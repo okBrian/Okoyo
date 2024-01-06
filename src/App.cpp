@@ -94,12 +94,11 @@ int main()
 
     Shader fboProgram ("../../res/framebuffer.vert", "../../res/framebuffer.frag");
     fboProgram.Bind();
-    glUniform1i(glGetUniformLocation(fboProgram.getID(), "screenTexture"), 0);
+    fboProgram.SetUniform1i("screenTexture", 0);
 
     // Error checking framebuffer //
-    auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (fboStatus != GL_FRAMEBUFFER_COMPLETE)
-        APP_ERROR("Framebuffer error: {}", fboStatus);
+    if (!fbo.isComplete())
+        APP_ERROR("FRAMEBUFFER::ERROR:NOT COMPLETE");
 
     fbo.Unbind();
     fboProgram.Unbind();

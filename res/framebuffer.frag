@@ -1,4 +1,3 @@
-// Version of GLSL we are using
 #version 450 core
 // Outputs a vec4 color
 layout(location  = 0) out vec4 FragColor;
@@ -42,5 +41,4 @@ void main()
     );
     vec3 tex = rgb2hsv(Texture);
     FragColor = ((step(hmin, tex.r) - step(hmax, tex.r)) * (step(smin, tex.g) - step(smax, tex.g)) * (step(vmin, tex.b) - step(vmax, tex.b))) * colorArr[texCodeId];
-
 }

@@ -10,12 +10,9 @@ uniform sampler2D screenTexture;
 uniform int texCodeId;
 
 // Uniforms for HSV For color masking
-uniform float hmax;
-uniform float hmin;
-uniform float smax;
-uniform float smin;
-uniform float vmax;
-uniform float vmin;
+uniform vec2 h;
+uniform vec2 s;
+uniform vec2 v;
 
 // All components are in the range [0…1], including hue.
 vec3 rgb2hsv(vec4 c)
@@ -45,7 +42,7 @@ void main()
 
     // For Color Masking
     vec3 tex = rgb2hsv(Texture);
-    float colorMask = ((step(hmin, tex.r) - step(hmax, tex.r)) * (step(smin, tex.g) - step(smax, tex.g)) * (step(vmin, tex.b) - step(vmax, tex.b)));
+    float colorMask = ((step(h[0], tex.r) - step(h[1], tex.r)) * (step(s[0], tex.g) - step(s[1], tex.g)) * (step(v[0], tex.b) - step(v[1], tex.b)));
 
     // Out Color
     FragColor = colorMask * colorArr[texCodeId];

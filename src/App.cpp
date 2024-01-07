@@ -94,7 +94,7 @@ int main()
 
     Shader fboProgram ("../../res/framebuffer.vert", "../../res/framebuffer.frag");
     fboProgram.Bind();
-    fboProgram.SetUniform1i("screenTexture", 0);
+    fboProgram.setUniform1<GLint>("screenTexture", 0);
 
     // Error checking framebuffer //
     if (!fbo.isComplete())
@@ -137,18 +137,14 @@ int main()
         shaderProgram.Bind();
         texture.Bind();
         renderer.Draw(vao, ibo, shaderProgram);
-
         // Bind the default framebuffer
         fbo.Unbind();
         // Draw the framebuffer rectangle
         fboProgram.Bind();
-        fboProgram.SetUniform1i("texCodeId", select);
-        fboProgram.SetUniform1f("hmin", static_cast<float>(colorRange[0]) / 255);
-        fboProgram.SetUniform1f("hmax", static_cast<float>(colorRange[1]) / 255);
-        fboProgram.SetUniform1f("smin", static_cast<float>(colorRange[2]) / 255);
-        fboProgram.SetUniform1f("smax", static_cast<float>(colorRange[3]) / 255);
-        fboProgram.SetUniform1f("vmin", static_cast<float>(colorRange[4]) / 255);
-        fboProgram.SetUniform1f("vmax", static_cast<float>(colorRange[5]) / 255);
+        fboProgram.setUniform1<GLint>("texCodeId", select);
+        fboProgram.setUniform2<GLfloat>("h", static_cast<float>(colorRange[0]) / 255, static_cast<float>(colorRange[1]) / 255);
+        fboProgram.setUniform2<GLfloat>("s", static_cast<float>(colorRange[2]) / 255, static_cast<float>(colorRange[3]) / 255);
+        fboProgram.setUniform2<GLfloat>("v", static_cast<float>(colorRange[4]) / 255, static_cast<float>(colorRange[5]) / 255);
 
         fboVAO.Bind();
         fbo.BindTexture();

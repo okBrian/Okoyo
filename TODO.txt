@@ -1,14 +1,6 @@
 
 NAME OF APP - [ TO BE DECIDED ]
 
-    RENDERER - 
-        OPENGL
-        Swtich to Vulkan Later
-    
 
 1. Get the Renderer and Logging with timing Finished
     event system
-2. Imgui Implentation
-3. Get Color Code Conversions working through shaders
-4. Get Color Masking through Shaders 
-5. Apply to an AI model possibly

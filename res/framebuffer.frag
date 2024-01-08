@@ -14,6 +14,9 @@ uniform vec2 h;
 uniform vec2 s;
 uniform vec2 v;
 
+// Uniforms for Kernel for post-proccessing
+uniform mat3 kernel;
+
 // All components are in the range [0…1], including hue.
 vec3 rgb2hsv(vec4 c)
 {
@@ -26,11 +29,9 @@ vec3 rgb2hsv(vec4 c)
     return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
 }
 
-void main()
+// Apply Color Format Options to Texture
+vec4 applyColorFormat(vec4 Texture)
 {
-    // Original Texture
-    vec4 Texture = texture2D(screenTexture, texCoord);
-
     // Different Color Formats
     vec4 colorArr[] = vec4[]
     (
@@ -40,10 +41,54 @@ void main()
     , vec4(rgb2hsv(Texture), 1)                                                     // HSV
     );
 
+    return colorArr[texCodeId];
+}
+
+// Apply Kernal Effects
+vec4 applyKernal()
+{
+    const float offset = 1.0 / 300.0;
+    vec2 offsets[9] = vec2[](
+        vec2(-offset,  offset), // top-left
+        vec2( 0.0f,    offset), // top-center
+        vec2( offset,  offset), // top-right
+        vec2(-offset,  0.0f),   // center-left
+        vec2( 0.0f,    0.0f),   // center-center
+        vec2( offset,  0.0f),   // center-right
+        vec2(-offset, -offset), // bottom-left
+        vec2( 0.0f,   -offset), // bottom-center
+        vec2( offset, -offset)  // bottom-right
+    );
+
+    vec3 sampleTex[9];
+    for(int i = 0; i < 9; i++)
+    {
+        sampleTex[i] = vec3(texture(screenTexture , texCoord.st + offsets[i]));
+    }
+    vec3 col = vec3(0.0);
+    for(int i = 0; i < 3; i++)
+    {
+        for(int j = 0; j < 3; j++)
+        {
+            col += sampleTex[i] * kernel[i][j];
+        }
+    }
+
+    return vec4(col, 1.0);
+}
+
+void main()
+{
+    // Original Texture
+    vec4 Texture = texture(screenTexture, texCoord);
+    vec4 colorFormattedTexture = applyColorFormat(Texture);
+
     // For Color Masking
     vec3 tex = rgb2hsv(Texture);
     float colorMask = ((step(h[0], tex.r) - step(h[1], tex.r)) * (step(s[0], tex.g) - step(s[1], tex.g)) * (step(v[0], tex.b) - step(v[1], tex.b)));
 
+    vec4 finalColorTexture = colorMask * colorFormattedTexture;
+
     // Out Color
-    FragColor = colorMask * colorArr[texCodeId];
+    FragColor = applyKernal() * finalColorTexture;
 }

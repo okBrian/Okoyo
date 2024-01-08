@@ -40,8 +40,7 @@ int main()
         2.0/16, 4.0/16, 2.0/16,
         1.0/16, 2.0/16, 1.0/16
     };
-
-    glm::mat3 kernel = glm::make_mat3(floatKernel);
+    float* floatKernelv = &floatKernel[0];
 
     int select = 0;
     int colorRange[6] = {0, 255, 0, 255, 0, 255};
@@ -137,6 +136,11 @@ int main()
         ImGui::DragIntRange2("Value", &colorRange[4], &colorRange[5], 1.0f, 0, 255, "%d");
         ImGui::End();
         
+        ImGui::Begin("Kernal");
+        ImGui::InputFloat3("1", floatKernelv);
+        ImGui::InputFloat3("2", floatKernelv+3);
+        ImGui::InputFloat3("3", floatKernelv+6);
+        ImGui::End();
 
         fbo.Bind();
 
@@ -155,7 +159,7 @@ int main()
         fboProgram.setUniform2<GLfloat>("h", static_cast<float>(colorRange[0]) / 255, static_cast<float>(colorRange[1]) / 255);
         fboProgram.setUniform2<GLfloat>("s", static_cast<float>(colorRange[2]) / 255, static_cast<float>(colorRange[3]) / 255);
         fboProgram.setUniform2<GLfloat>("v", static_cast<float>(colorRange[4]) / 255, static_cast<float>(colorRange[5]) / 255);
-        fboProgram.setUniformMatfv<glm::mat3>("kernel", kernel);
+        fboProgram.setUniformMatfv<glm::mat3>("kernel", glm::make_mat3(floatKernelv)); 
 
         fboVAO.Bind();
         fbo.BindTexture();

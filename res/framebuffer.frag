@@ -6,6 +6,12 @@ in vec2 texCoord;
 
 // Texture Sample from user
 uniform sampler2D screenTexture;
+
+//Uniforms for enabling different features
+uniform int enableColorConversions;
+uniform int enableColorMaskRange;
+uniform int enableKernel;
+
 // The Texture Code ID from user
 uniform int texCodeId;
 
@@ -81,14 +87,24 @@ void main()
 {
     // Original Texture
     vec4 Texture = texture(screenTexture, texCoord);
-    vec4 colorFormattedTexture = applyColorFormat(Texture);
+    // Color Conversions
+    if(bool(enableColorConversions)) 
+    {
+        Texture = applyColorFormat(Texture);
+    }
 
-    // For Color Masking
-    vec3 tex = rgb2hsv(Texture);
-    float colorMask = ((step(h[0], tex.r) - step(h[1], tex.r)) * (step(s[0], tex.g) - step(s[1], tex.g)) * (step(v[0], tex.b) - step(v[1], tex.b)));
+    // Color Masking
+    if(bool(enableColorMaskRange))
+    {
+        vec3 tex = rgb2hsv(Texture);
+        Texture *= ((step(h[0], tex.r) - step(h[1], tex.r)) * (step(s[0], tex.g) - step(s[1], tex.g)) * (step(v[0], tex.b) - step(v[1], tex.b)));
+    }
 
-    vec4 finalColorTexture = colorMask * colorFormattedTexture;
+    if(bool(enableKernel))
+    {
+        Texture *= applyKernal();
+    }
 
     // Out Color
-    FragColor = applyKernal() * finalColorTexture;
+    FragColor = Texture;
 }

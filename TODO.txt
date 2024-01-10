@@ -1,6 +1,10 @@
 
-NAME OF APP - [ TO BE DECIDED ]
+NAME OF APP - Okoyo idk
 
 
-1. Get the Renderer and Logging with timing Finished
-    event system
+1. Events and Timing maybe
+3. Allow for any type of jpg or png 
+4. Implement File uploadeder & saving features
+5. Cropping and drawing with mouse and line straightner
+6. SVD compressions
+7. Emscripten perharps **FUTURE**

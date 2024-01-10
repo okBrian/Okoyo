@@ -1,6 +1,8 @@
 #include <Core.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <vector>
+#include <memory>
 using namespace Core;
 
 #define width 1280
@@ -42,10 +44,16 @@ int main()
     };
     float* floatKernelv = &floatKernel[0];
 
-    int select = 0;
-    int colorRange[6] = {0, 255, 0, 255, 0, 255};
     bool showDemoWindow = true;
     auto LoggingLevel = spdlog::level::err;
+    bool enableColorMaskRange = false; 
+    bool enableKernel = false;
+    bool enableColorConversions = true;
+
+    int select = 0;
+    ImVec4 colorMin = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    ImVec4 colorMax = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+
 
     Logging::init();
     Logging::setCoreLevel(&LoggingLevel);
@@ -121,22 +129,26 @@ int main()
         ImGui::ShowDemoWindow(&showDemoWindow);
         ImGui::Begin("Option");
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::Checkbox("Coversion Buttons", &enableColorConversions);
+        ImGui::Checkbox("Color Mask Range", &enableColorMaskRange);
+        ImGui::Checkbox("Kernel", &enableKernel);
         ImGui::End();
         
-        ImGui::Begin("Conversion Button");
+        ImGui::Begin("Conversion Buttons");
         ImGui::RadioButton("RGB", &select, 0);
         ImGui::RadioButton("BGR", &select, 1);
         ImGui::RadioButton("Grayscale", &select, 2);
         ImGui::RadioButton("HSV", &select, 3);
         ImGui::End();
 
-        ImGui::Begin("Color Maskings");
-        ImGui::DragIntRange2("Hue", &colorRange[0], &colorRange[1], 1.0f, 0, 255, "%d");
-        ImGui::DragIntRange2("Saturation", &colorRange[2], &colorRange[3], 1.0f, 0, 255, "%d");
-        ImGui::DragIntRange2("Value", &colorRange[4], &colorRange[5], 1.0f, 0, 255, "%d");
+        ImGui::Begin("Color Mask Range");
+        ImGui::Text("Color Min");
+        ImGui::ColorEdit4("Color Min", (float*)&colorMin, ImGuiColorEditFlags_DisplayHSV | ImGuiColorEditFlags_InputHSV);
+        ImGui::Text("Color Max"); 
+        ImGui::ColorEdit4("Color Max", (float*)&colorMax, ImGuiColorEditFlags_DisplayHSV | ImGuiColorEditFlags_InputHSV);
         ImGui::End();
         
-        ImGui::Begin("Kernal");
+        ImGui::Begin("Kernel");
         ImGui::InputFloat3("1", floatKernelv);
         ImGui::InputFloat3("2", floatKernelv+3);
         ImGui::InputFloat3("3", floatKernelv+6);
@@ -155,10 +167,13 @@ int main()
         // Draw the framebuffer rectangle
         shaderProgram.Unbind();
         fboProgram.Bind();
+        fboProgram.setUniform1<GLint>("enableColorConversions", static_cast<int>(enableColorConversions));
+        fboProgram.setUniform1<GLint>("enableColorMaskRange", static_cast<int>(enableColorMaskRange));
+        fboProgram.setUniform1<GLint>("enableKernel", static_cast<int>(enableKernel));
         fboProgram.setUniform1<GLint>("texCodeId", select);
-        fboProgram.setUniform2<GLfloat>("h", static_cast<float>(colorRange[0]) / 255, static_cast<float>(colorRange[1]) / 255);
-        fboProgram.setUniform2<GLfloat>("s", static_cast<float>(colorRange[2]) / 255, static_cast<float>(colorRange[3]) / 255);
-        fboProgram.setUniform2<GLfloat>("v", static_cast<float>(colorRange[4]) / 255, static_cast<float>(colorRange[5]) / 255);
+        fboProgram.setUniform2<GLfloat>("h", colorMin.x, colorMax.x);
+        fboProgram.setUniform2<GLfloat>("s", colorMin.y, colorMax.y);
+        fboProgram.setUniform2<GLfloat>("v", colorMin.z, colorMax.z);
         fboProgram.setUniformMatfv<glm::mat3>("kernel", glm::make_mat3(floatKernelv)); 
 
         fboVAO.Bind();
